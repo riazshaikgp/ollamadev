@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import za.co.fnb.cjp.sit.Configure;
 
 /**
  *
@@ -25,18 +26,11 @@ import org.springframework.stereotype.Service;
 public class Generator {
     @Autowired
     OllamaAPI api;
-    @Autowired
-    OllamaChatRequestBuilder builder;
-    
-    @Autowired
-    OptionsBuilder codebuilder;
-    @Autowired
-    OllamaChatRequestBuilder codeprompt;
     String answer;
     
     public OllamaChatResult prompt(String prompt) throws IOException, OllamaBaseException, InterruptedException, URISyntaxException{
         api.setVerbose(true);
-        OllamaChatRequestModel request = codeprompt.withMessage(OllamaChatMessageRole.USER, prompt).build();
+        OllamaChatRequestModel request = Configure.codeOnlyChatRequestBuilder().withMessage(OllamaChatMessageRole.USER, prompt).build();
         OllamaChatResult result = api.chat(request);
         answer = result.getResponse();
         return result;
@@ -44,21 +38,10 @@ public class Generator {
     
     public OllamaChatResult directories() throws IOException, OllamaBaseException, InterruptedException, URISyntaxException{
         api.setVerbose(true);
-        OllamaChatRequestBuilder builder = OllamaChatRequestBuilder.getInstance(OllamaModelType.CODELLAMA);
-        builder.withMessage(OllamaChatMessageRole.SYSTEM, 
-                "You are an expert coder and understand different programming languages. "
-                + "Given a question, answer ONLY with commands required to create the directory structure required for the project. "
-                + "Produce clean, formatted and indented code in markdown format. " 
-                + "Your answer must be for " + System.getProperty("os.name")
-                + ". IMPORTANT RULES TO FOLLOW!! "
-                + "DO NOT include ANY extra text apart from commands to be used. Follow this instruction very strictly! "
-                + "Do NOT give an answer which expects the user to copy and paste code into files! "
-                + "The commands given must create each files full content as well."
-                + "Use echo or an equivalent for the operating system to output each line of code to the respective file. Do not wrap multiple lines with one output command."
-                + "Ensure the commands are properly escaped for the relevant operating system so that they will successfully create the files with the correct code.");
+        
                 
-        String prompt = "Given the following code and wanting to create this project on a " + System.getProperty("os.name") + " system what would be the commands to create a directory structure for this project and insert all the relevant code into the respective files using only the command line. " + answer;
-        OllamaChatRequestModel request = builder.withMessage(OllamaChatMessageRole.USER, prompt).build();
+        String prompt = "Given the following code and wanting to create this project on a " + System.getProperty("os.name") + " system what would be the commands to create a directory structure for this project using only the command line. " + answer;
+        OllamaChatRequestModel request = Configure.cmdOnlyChatRequestBuilder().withMessage(OllamaChatMessageRole.USER, prompt).build();
         return api.chat(request);
     }
 
