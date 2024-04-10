@@ -53,7 +53,7 @@ public class Configure {
     }
     
     public static OllamaChatRequestBuilder cmdOnlyChatRequestBuilder(){
-        OllamaChatRequestBuilder builder = OllamaChatRequestBuilder.getInstance(OllamaModelType.CODELLAMA);
+        OllamaChatRequestBuilder builder = OllamaChatRequestBuilder.getInstance(OllamaModelType.LLAVA);
         builder.withMessage(OllamaChatMessageRole.SYSTEM, 
                 "You are an expert coder and understand different programming languages.\n"
                 + "Given a question, answer ONLY with a script to create the directory structure required for the project.\n"
